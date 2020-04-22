@@ -4,15 +4,16 @@ import guru.springframework.sfgrecipe.domain.*;
 import guru.springframework.sfgrecipe.repositories.CategoryRepository;
 import guru.springframework.sfgrecipe.repositories.RecipeRepository;
 import guru.springframework.sfgrecipe.repositories.UnitOfMeasureRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
+@Slf4j
 @Component
 public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEvent> {
 
@@ -29,13 +30,15 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
 	}
 
 	@Override
+	@Transactional
 	public void onApplicationEvent(ContextRefreshedEvent event) {
+		log.debug("In RecipeBootstrap - onApplicationEvent()");
 		recipeRepository.saveAll(getRecipes());
 	}
 
-	private List<Recipe> getRecipes() {
+	private Set<Recipe> getRecipes() {
 
-		List<Recipe> recipes = new ArrayList<>(2);
+		Set<Recipe> recipes = new HashSet<>(2);
 
 		// get UOMs
 		Optional<UnitOfMeasure> eachUomOptional = unitOfMeasureRepository.findByDescription("Each");
